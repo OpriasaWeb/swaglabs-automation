@@ -1,0 +1,25 @@
+{
+  "name": "automation-exam",
+  "version": "1.0.0",
+  "description": "swag labs automation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "automation-exam"
+  },
+  "author": "Jeremy Opriasa",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^5.1.1",
+    "express": "^4.19.2",
+    "mocha": "^10.4.0",
+    "nodemon": "^3.1.0",
+    "selenium-webdriver": "^4.21.0"
+  },
+  "devDependencies": {
+    "mochawesome": "^7.1.3"
+  }
+}
