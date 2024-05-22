@@ -2,14 +2,15 @@ const { By, Builder, until, Key } = require("selenium-webdriver")
 const assert = require("assert")
 
 describe("Test swag lab links", async () => {
+  let driver
   before(async () => {
     driver = await new Builder().forBrowser("MicrosoftEdge").build();
     await driver.get("https://www.saucedemo.com/");
   });
 
-  // after(async () => {
-  //   await driver.quit();
-  // });
+  after(async () => {
+    await driver.quit();
+  });
 
   describe("Test login with correct credentials to redirect on inventory page", async () => {
     it("Verify if user is able to login using correct username and password", async () => {

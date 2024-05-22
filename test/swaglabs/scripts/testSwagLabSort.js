@@ -3,6 +3,7 @@ const { Select } = require("selenium-webdriver/lib/select")
 const assert = require("assert")
 
 describe("Test the sorting functionalities", async () => {
+  let driver
   before(async () => {
     driver = await new Builder().forBrowser("MicrosoftEdge").build();
     await driver.get("https://www.saucedemo.com/");

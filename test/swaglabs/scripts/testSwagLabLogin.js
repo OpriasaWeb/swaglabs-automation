@@ -36,7 +36,7 @@ describe("Verify login functionalities of Swag Labs", async () => {
         // Epic sadface: Username and password do not match any user in this service
         let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
   
-        assert.strictEqual("Epic sadface: Username and password do not match any user in this service", validationMessage)
+        assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
 
       } catch (error) {
         console.log(error)
@@ -61,7 +61,7 @@ describe("Verify login functionalities of Swag Labs", async () => {
   
         let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
   
-        assert.strictEqual("Epic sadface: Username and password do not match any user in this service", validationMessage)
+        assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
 
   
       } catch (error) {
@@ -87,7 +87,7 @@ describe("Verify login functionalities of Swag Labs", async () => {
   
         let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
   
-        assert.strictEqual("Epic sadface: Username and password do not match any user in this service", validationMessage)
+        assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
   
       } catch (error) {
         console.log(error)
@@ -114,7 +114,7 @@ describe("Verify login functionalities of Swag Labs", async () => {
   
         let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
   
-        assert.strictEqual("Epic sadface: Username is required", await validationMessage.getText())
+        assert.strictEqual(await validationMessage.getText(), "Epic sadface: Username is required")
   
       } catch (error) {
         console.log(error)
@@ -135,8 +135,41 @@ describe("Verify login functionalities of Swag Labs", async () => {
   
         let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
   
-        assert.strictEqual("Epic sadface: Password is required", await validationMessage.getText())
+        assert.strictEqual(await validationMessage.getText(), "Epic sadface: Password is required")
   
+      } catch (error) {
+        console.log(error)
+      }
+    })
+
+    it("Verify if locked_out_user is unable to login", async () => {
+      try {
+        // Close the validation error message
+        await driver.findElement(By.className("error-button")).click()
+
+        // Clear the username input for next it block
+        const usernameField = await driver.findElement(By.id("user-name"))
+        await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
+        await usernameField.sendKeys(Key.BACK_SPACE) 
+
+        // Clear password field
+        const passwordField = await driver.findElement(By.id("password"))
+        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
+        await passwordField.sendKeys(Key.BACK_SPACE) 
+
+        await driver.findElement(By.id("user-name")).sendKeys("locked_out_user")
+        await driver.findElement(By.id("password")).sendKeys("secret_sauce")
+
+        await driver.findElement(By.id("login-button")).click()
+
+        let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
+  
+        assert.strictEqual(validationMessage, "Epic sadface: Sorry, this user has been locked out.")
+
+        const url = "https://www.saucedemo.com/"
+        let currentUrl = await driver.getCurrentUrl();
+        assert.equal(currentUrl, url)
+
       } catch (error) {
         console.log(error)
       }
@@ -150,6 +183,11 @@ describe("Verify login functionalities of Swag Labs", async () => {
         await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
         await usernameField.sendKeys(Key.BACK_SPACE) 
 
+        // Clear password field
+        const passwordField = await driver.findElement(By.id("password"))
+        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
+        await passwordField.sendKeys(Key.BACK_SPACE) 
+
         // Fill in password
         await driver.findElement(By.id("password")).sendKeys("secret_sauce")
 
@@ -157,7 +195,7 @@ describe("Verify login functionalities of Swag Labs", async () => {
   
         let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
 
-        assert.strictEqual("Epic sadface: Username is required", await validationMessage.getText())
+        assert.strictEqual(await validationMessage.getText(), "Epic sadface: Username is required")
 
       } catch (error) {
         console.log()
@@ -189,7 +227,6 @@ describe("Verify login functionalities of Swag Labs", async () => {
         console.log(error)
       }
     })
-
   })
 
 

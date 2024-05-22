@@ -5,6 +5,6 @@ Software testing checklist
 3. Exploratory testing
 4. Familiar with flow of application
 5. Write test cases
-6. Code test scripts
+6. Code test automation scripts
 
 
