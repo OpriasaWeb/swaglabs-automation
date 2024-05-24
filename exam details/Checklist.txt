@@ -2,10 +2,8 @@ Software testing checklist
 
 1. Understand the instructions (from gmail)
 2. Prepare test data for test cases
-3. Exploratory testing
+3. Conduct exploratory testing
 4. Familiar with flow of application
 5. Write test cases
 6. Replicate the manual test cases to automation
 7. Code test scripts
-
-
