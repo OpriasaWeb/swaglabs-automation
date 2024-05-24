@@ -12,6 +12,16 @@ describe("Test swag lab links", async () => {
     await driver.quit();
   });
 
+  async function verifyUrl(url){
+    let currentUrl = await driver.getCurrentUrl();
+    assert.strictEqual(currentUrl, url);
+  }
+
+  async function verifyTitle(expectedTitle) {
+    let currentPageTitle = await driver.getTitle();
+    assert.strictEqual(currentPageTitle, expectedTitle);
+  }
+
   describe("Test login with correct credentials to redirect on inventory page", async () => {
     it("Verify if user is able to login using correct username and password", async () => {
 
@@ -20,22 +30,17 @@ describe("Test swag lab links", async () => {
       await driver.findElement(By.id("login-button")).click();
       await driver.wait(until.urlIs("https://www.saucedemo.com/inventory.html"), 10000); // Wait until redirected to inventory page
 
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
+
     });
   });
 
   describe("Test swag lab links", async () => {
     it("Verify if All Items link will provide all items available in the products", async () => {
 
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
 
-      const pageTitle = "Swag Labs";
-      let currentPage = await driver.getTitle()
-      assert.equal(currentPage, pageTitle)
+      await verifyTitle("Swag Labs") // Note, feel free to change to test assertion
 
       // Locate the cart icon
       let cartIcon = await driver.wait(until.elementLocated(By.xpath("//a[@data-test='shopping-cart-link']")), 5000)
@@ -44,9 +49,7 @@ describe("Test swag lab links", async () => {
       // Click the cart icon
       await driver.findElement(By.xpath("//a[@data-test='shopping-cart-link']")).click()
 
-      const secondUrl = "https://www.saucedemo.com/cart.html";
-      let getSecondUrl = await driver.getCurrentUrl();
-      assert.equal(getSecondUrl, secondUrl);
+      await verifyUrl("https://www.saucedemo.com/cart.html") // Note, feel free to change to test assertion
 
       // Click the burger menu to click the link
       await driver.findElement(By.id("react-burger-menu-btn")).click()
@@ -81,9 +84,7 @@ describe("Test swag lab links", async () => {
         await driver.findElement(By.id("inventory_sidebar_link")).click()
 
         // Assert if the page will redirect to inventory
-        const url = "https://www.saucedemo.com/inventory.html";
-        let currentUrl = await driver.getCurrentUrl();
-        assert.equal(currentUrl, url);
+        await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
 
         // Check also the products sorted to A-Z alphabetically
         // Fetch all product names
@@ -138,10 +139,7 @@ describe("Test swag lab links", async () => {
       await driver.findElement(By.id("logout_sidebar_link")).click()
 
       // Assert if the page will redirect to login
-      const url = "https://www.saucedemo.com/";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
-
+      await verifyUrl("https://www.saucedemo.com/")
     })
 
     it("Verify if about link will redirect to https://saucelabs.com/", async () => {
@@ -152,9 +150,7 @@ describe("Test swag lab links", async () => {
       await driver.findElement(By.id("login-button")).click();
       await driver.wait(until.urlIs("https://www.saucedemo.com/inventory.html"), 10000); // Wait until redirected to inventory page
 
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
 
       // Click the burger menu to click the link
       await driver.findElement(By.id("react-burger-menu-btn")).click()
@@ -174,9 +170,7 @@ describe("Test swag lab links", async () => {
         await aboutPage.click()
 
         // Assert if the page will redirect to about or saucelabs
-        const urlAbout = "https://saucelabs.com/";
-        let currentUrlAbout = await driver.getCurrentUrl();
-        assert.equal(currentUrlAbout, urlAbout, "Redirects to about page of saucelabs");
+        await verifyUrl("https://saucelabs.com/") // Note, feel free to change to test assertion
       }
       
     })
