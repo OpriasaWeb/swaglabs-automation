@@ -13,17 +13,74 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
     await driver.quit();
   });
 
+  async function verifyUrl(url){
+    let currentUrl = await driver.getCurrentUrl();
+    assert.strictEqual(currentUrl, url);
+  }
+
+  async function verifyTitle(expectedTitle) {
+    let currentPageTitle = await driver.getTitle();
+    assert.strictEqual(currentPageTitle, expectedTitle);
+  }
+
+  async function verifyCurrentPage(page){
+    let currentPageTitle = await driver.findElement(By.className("title"))
+    assert.deepEqual(await currentPageTitle.getText(), page)
+  }
+
+  async function verifyCartBadge(badge){
+
+  }
+
+  async function completeInformation(firstname, lastname, zipcode){
+    await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys(firstname)
+    await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys(lastname)
+    await driver.findElement(By.xpath("//input[@id='postal-code']")).sendKeys(zipcode)
+  }
+
+  async function firstAndLastName(firstname, lastname){
+    await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys(firstname)
+    await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys(lastname)
+  }
+
+  async function firstNameAndZipCode(firstname, zipcode){
+    await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys(firstname)
+    await driver.findElement(By.xpath("//input[@id='postal-code']")).sendKeys(zipcode)
+  }
+
+  async function lastNameAndZipCode(lastname, zipcode){
+    await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys(lastname)
+    await driver.findElement(By.xpath("//input[@id='postal-code']")).sendKeys(zipcode)
+  }
+
+  async function addToCart(cart){
+    let addtoCart = await driver.findElement(By.id(cart))
+    await addtoCart.click()
+  }
+
+  async function removeToCart(remove){
+    let removeProduct = await driver.findElement(By.id(remove)) // note, will remove here
+    await removeProduct.click()
+  }
+
+  async function login(username, password){
+    await driver.findElement(By.id("user-name")).sendKeys(username);
+    await driver.findElement(By.id("password")).sendKeys(password);
+    await driver.findElement(By.id("login-button")).click();
+  }
+
+  async function clearInput(name){
+    const clearField = await driver.findElement(By.xpath(`//input[@id='${name}']`))
+    await clearField.sendKeys(Key.CONTROL, 'a') 
+    await clearField.sendKeys(Key.BACK_SPACE)
+  }
+
   describe("Test login with correct credentials to redirect on inventory page", async () => {
     it("Verify if user is able to login using correct username and password", async () => {
-
-      await driver.findElement(By.id("user-name")).sendKeys("standard_user");
-      await driver.findElement(By.id("password")).sendKeys("secret_sauce");
-      await driver.findElement(By.id("login-button")).click();
+      await login("standard_user", "secret_sauce")
       await driver.wait(until.urlIs("https://www.saucedemo.com/inventory.html"), 10000); // Wait until redirected to inventory page
-
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
+      // Assert url
+      await verifyUrl("https://www.saucedemo.com/inventory.html")
     });
   });
 
@@ -31,23 +88,17 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
     it("Verify if user is able to checkout with product/s on its cart", async () => {
       // Assertion if on the right page
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
+      await verifyUrl("https://www.saucedemo.com/inventory.html")
   
-      const pageTitle = "Swag Labs";
-      let currentPage = await driver.getTitle()
-      assert.equal(currentPage, pageTitle)
+      // Assert the title of the page
+      await verifyTitle("Swag Labs")
 
       // Add to cart
-      let firstAddToCart = await driver.findElement(By.id("add-to-cart-sauce-labs-bolt-t-shirt"))
-      await firstAddToCart.click()
+      addToCart("add-to-cart-sauce-labs-bolt-t-shirt")
 
-      let secondAddToCart = await driver.findElement(By.id("add-to-cart-test.allthethings()-t-shirt-(red)")) // note, to be remove as testing goes on
-      await secondAddToCart.click()
+      addToCart("add-to-cart-test.allthethings()-t-shirt-(red)")
 
-      let thirdAddToCart = await driver.findElement(By.id("add-to-cart-sauce-labs-onesie")) 
-      await thirdAddToCart.click()
+      addToCart("add-to-cart-sauce-labs-onesie")
 
       // Assert the cart badge current value
       // Wait for the add to cart increment value
@@ -61,18 +112,14 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
       // Click the cart icon
       await addedToCartText.click()
 
-      // Assert the redirected page
-      const cartUrl = "https://www.saucedemo.com/cart.html";
-      let cartCurrentUrl = await driver.getCurrentUrl();
-      assert.equal(cartCurrentUrl, cartUrl);
+      // Assert the redirected page - cart page
+      await verifyUrl("https://www.saucedemo.com/cart.html")
 
       // Assert the title of the current page
-      let currentPageTitle = await driver.findElement(By.className("title"))
-      assert.deepEqual(await currentPageTitle.getText(), "Your Cart")
+      verifyCurrentPage("Your Cart")
 
-      // Assert the product/s added to cart
-      let removeOneProduct = await driver.findElement(By.id("remove-sauce-labs-bolt-t-shirt")) // note, will remove here
-      await removeOneProduct.click()
+      // Assert the product/s remove to cart
+      removeToCart("remove-sauce-labs-bolt-t-shirt") // note, will remove here
 
       let currentCartBadge = await driver.findElement(By.className("shopping_cart_badge"))
       assert.deepEqual(await currentCartBadge.getText(), 2, "Successfully remove the added product")
@@ -94,18 +141,14 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
       await driver.findElement(By.id("checkout")).click()
 
-      // Assert next page
-      const checkoutUrl = "https://www.saucedemo.com/checkout-step-one.html";
-      let checkoutCurrentUrl = await driver.getCurrentUrl();
-      assert.deepEqual(checkoutCurrentUrl, checkoutUrl);
+      // Assert next page - check out step one page
+      await verifyUrl("https://www.saucedemo.com/checkout-step-one.html")
 
     })
 
     it("Verify if user is unable to continue checking-out product with empty information", async () => {
       // Assert current page
-      const checkoutUrl = "https://www.saucedemo.com/checkout-step-one.html";
-      let checkoutCurrentUrl = await driver.getCurrentUrl();
-      assert.deepEqual(checkoutCurrentUrl, checkoutUrl);
+      await verifyUrl("https://www.saucedemo.com/checkout-step-one.html")
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -120,8 +163,7 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
     it("Verify if user is unable to move forward checking-out product with empty first name but filled-in last name and zip code", async () => {
       // Fill in last name and zip code but leave the first name empty
-      await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys("test")
-      await driver.findElement(By.xpath("//input[@id='postal-code']")).sendKeys("1750")
+      lastNameAndZipCode("test", "1750")
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -136,9 +178,7 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
     it("Verify if user is unable to move forward checking-out product with empty first name and last name but filled-in zip code", async () => {
       // Clear last name
-      const lastNameField = await driver.findElement(By.xpath("//input[@id='last-name']"))
-      await lastNameField.sendKeys(Key.CONTROL, 'a') 
-      await lastNameField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('last-name')
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -156,9 +196,7 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
       await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys("test")
 
       // Clear postal
-      const postalField = await driver.findElement(By.xpath("//input[@id='postal-code']"))
-      await postalField.sendKeys(Key.CONTROL, 'a') 
-      await postalField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('postal-code')
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -173,13 +211,10 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
     it("Verify if user is unable to move forward checking-out product with empty last name but filled-in first name and zip code", async () => {
       // Fill in first name and zip code but leave the last name empty
-      await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys("test")
-      await driver.findElement(By.xpath("//input[@id='postal-code']")).sendKeys("17500")
+      await firstNameAndZipCode("test", "17500")
 
       // Clear postal
-      const postalField = await driver.findElement(By.xpath("//input[@id='last-name']"))
-      await postalField.sendKeys(Key.CONTROL, 'a') 
-      await postalField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('last-name')
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -195,22 +230,16 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
     it("Verify if user is unable to move forward checking-out product with empty last name and zip code but filled-in first name", async () => {
 
       // Clear first name
-      const firstNameField = await driver.findElement(By.xpath("//input[@id='first-name']"))
-      await firstNameField.sendKeys(Key.CONTROL, 'a') 
-      await firstNameField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('first-name')
 
       // Fill in first name but leave the last name and zip code empty
       await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys("test")
 
       // Clear last name
-      const lastNameField = await driver.findElement(By.xpath("//input[@id='last-name']"))
-      await lastNameField.sendKeys(Key.CONTROL, 'a') 
-      await lastNameField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('last-name')
 
       // Clear postal
-      const postalField = await driver.findElement(By.xpath("//input[@id='postal-code']"))
-      await postalField.sendKeys(Key.CONTROL, 'a') 
-      await postalField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('postal-code')
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -225,18 +254,13 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
     it("Verify if user is unable to move forward checking-out product with empty zip code but filled-in first name and last name", async () => {
       // Clear first name
-      const firstNameField = await driver.findElement(By.xpath("//input[@id='first-name']"))
-      await firstNameField.sendKeys(Key.CONTROL, 'a') 
-      await firstNameField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('first-name')
 
       // Fill in first name but leave the last name and zip code empty
-      await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys("test")
-      await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys("test")
+      await firstAndLastName("test", "test")
 
       // Clear postal
-      const postalField = await driver.findElement(By.xpath("//input[@id='postal-code']"))
-      await postalField.sendKeys(Key.CONTROL, 'a') 
-      await postalField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('postal-code')
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -249,29 +273,30 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
       assert.equal(await errorMessage.getText(), "Error: Postal Code is required")
     })
 
-    it("Verify if user is unable to move forward checking-out product with complete information", async () => {
+    it("Verify if user is able to move forward checking-out product with complete information", async () => {
       // Clear first name
-      const firstNameField = await driver.findElement(By.xpath("//input[@id='first-name']"))
-      await firstNameField.sendKeys(Key.CONTROL, 'a') 
-      await firstNameField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('first-name')
 
       // Clear last name
-      const lastNameField = await driver.findElement(By.xpath("//input[@id='last-name']"))
-      await lastNameField.sendKeys(Key.CONTROL, 'a') 
-      await lastNameField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('last-name')
 
       // Clear postal
-      const postalField = await driver.findElement(By.xpath("//input[@id='postal-code']"))
-      await postalField.sendKeys(Key.CONTROL, 'a') 
-      await postalField.sendKeys(Key.BACK_SPACE) 
+      await clearInput('postal-code')
 
       // Fill in first name but leave the last name and zip code empty
-      await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys("test")
-      await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys("test")
-      await driver.findElement(By.xpath("//input[@id='postal-code']")).sendKeys("1750")
+      completeInformation("test", "test", "1750")
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
+
+      // let form = await driver.findElement(By.id("continue"));
+      // await form.submit();
+
+      // Optionally, you can wait for a new page or some result to confirm the form submission
+      // await driver.wait(until.urlIs("https://www.saucedemo.com/checkout-step-two.html"), 1000);
+
+      // Assert the right page - check out step two
+      // await verifyUrl("https://www.saucedemo.com/checkout-step-two.html")
 
       const url = "https://www.saucedemo.com/checkout-step-two.html";
       let currentUrl = await driver.getCurrentUrl();
@@ -312,9 +337,8 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
       await driver.findElement(By.id("finish")).click()
 
-      const completeUrl = "https://www.saucedemo.com/checkout-complete.html";
-      let completeCurrentUrl = await driver.getCurrentUrl();
-      assert.equal(completeCurrentUrl, completeUrl);
+      // Assert the right page - check out complete
+      await verifyUrl("https://www.saucedemo.com/checkout-complete.html")
 
       // Assert the title of the current page
       let currentPageTitle = await driver.findElement(By.className("title"))
@@ -326,9 +350,7 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
       // Back to product e-commerce
       await driver.findElement(By.id("back-to-products")).click()
 
-      const defaultUrl = "https://www.saucedemo.com/inventory.html";
-      let defaultCurrentUrl = await driver.getCurrentUrl();
-      assert.equal(defaultCurrentUrl, defaultUrl);
+      await verifyUrl("https://www.saucedemo.com/inventory.html")
 
     })
 
