@@ -37,7 +37,6 @@ describe("Test swag lab links", async () => {
 
   describe("Test swag lab links", async () => {
     it("Verify if All Items link will provide all items available in the products", async () => {
-
       await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
 
       await verifyTitle("Swag Labs") // Note, feel free to change to test assertion

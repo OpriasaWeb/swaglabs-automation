@@ -13,6 +13,16 @@ describe("Test add to cart functionality", async () => {
     await driver.quit();
   });
 
+  async function verifyUrl(url){
+    let currentUrl = await driver.getCurrentUrl();
+    assert.strictEqual(currentUrl, url);
+  }
+
+  async function verifyTitle(expectedTitle) {
+    let currentPageTitle = await driver.getTitle();
+    assert.strictEqual(currentPageTitle, expectedTitle);
+  }
+
   describe("Test login with correct credentials to redirect on inventory page", async () => {
     it("Verify if user is able to login using correct username and password", async () => {
 
@@ -21,9 +31,8 @@ describe("Test add to cart functionality", async () => {
       await driver.findElement(By.id("login-button")).click();
       await driver.wait(until.urlIs("https://www.saucedemo.com/inventory.html"), 10000); // Wait until redirected to inventory page
 
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
+      await verifyUrl("https://www.saucedemo.com/inventory.html")
+
     });
   });
 
@@ -31,13 +40,9 @@ describe("Test add to cart functionality", async () => {
     it("Verify if the cart is incrementing to one after clicking the Add to cart button in each product", async () => {
 
       // Assertion if on the right page
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
-  
-      const pageTitle = "Swag Labs";
-      let currentPage = await driver.getTitle()
-      assert.equal(currentPage, pageTitle)
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
+
+      await verifyTitle("Swag Labs") // Note, feel free to change to test assertion
 
       // Add to cart
       let firstAddToCart = await driver.findElement(By.id("add-to-cart-sauce-labs-bolt-t-shirt"))
@@ -58,13 +63,8 @@ describe("Test add to cart functionality", async () => {
     })
 
     it("Verify if the cart is decrementing to one after clicking the Remove button in each product", async () => {
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
-  
-      const pageTitle = "Swag Labs";
-      let currentPage = await driver.getTitle()
-      assert.equal(currentPage, pageTitle)
+
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
 
       // Wait for the element to change
       await driver.wait(until.elementLocated(By.id("remove-sauce-labs-bolt-t-shirt")), 5000)
@@ -84,15 +84,18 @@ describe("Test add to cart functionality", async () => {
       
     })
 
+    it("Verify if the specific product is the same after clicking the title", async () => {
+
+    })
+
+    it("Verify if add to cart and remove button are working on a specific product and verify the cart badge if incrementing or decrementing", async () => {
+      
+    })
+
     it("Verify if the cart is resetting and if the 'Remove' button reverts to 'Add to cart' once the user logs out", async () => {
-      const url = "https://www.saucedemo.com/inventory.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
-  
-      const pageTitle = "Swag Labs";
-      let currentPage = await driver.getTitle()
-      assert.equal(currentPage, pageTitle)
-  
+      
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
+
       // Re-add to cart the removed product
       await driver.wait(until.elementLocated(By.id("add-to-cart-sauce-labs-bolt-t-shirt")), 2000)
       let firstAddToCart = await driver.findElement(By.id("add-to-cart-sauce-labs-bolt-t-shirt"))  //button[@id='add-to-cart-sauce-labs-bolt-t-shirt' and @name='add-to-cart-sauce-labs-bolt-t-shirt']
@@ -115,9 +118,7 @@ describe("Test add to cart functionality", async () => {
         await logoutLink.click()
 
         // Assert if logout successfully, should redirect to login page
-        const url = "https://www.saucedemo.com/";
-        let currentUrl = await driver.getCurrentUrl();
-        assert.equal(currentUrl, url, "Successful logged out, redirected to login page.");
+        await verifyUrl("https://www.saucedemo.com/") // Note, feel free to change to test assertion
       }
       else{
         console.log("Ooops. Sidebar is hidden.")
@@ -129,9 +130,7 @@ describe("Test add to cart functionality", async () => {
       await driver.findElement(By.id("login-button")).click();
       await driver.wait(until.urlIs("https://www.saucedemo.com/inventory.html"), 10000); // Wait until redirected to inventory page
 
-      const reLoginUrl = "https://www.saucedemo.com/inventory.html";
-      let reLoginCurrentUrl = await driver.getCurrentUrl();
-      assert.equal(reLoginCurrentUrl, reLoginUrl, "Successful log in again.");
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // Note, feel free to change to test assertion
 
       // Check two products remove button
       await driver.wait(until.elementLocated(By.id("remove-test.allthethings()-t-shirt-(red)")), 2000)
