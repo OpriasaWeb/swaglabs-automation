@@ -1,5 +1,6 @@
 const { By, Builder, until, Key } = require("selenium-webdriver")
 const assert = require("assert")
+const { clear } = require("console")
 
 
 describe("Verify login functionalities of Swag Labs", async () => {
@@ -15,217 +16,142 @@ describe("Verify login functionalities of Swag Labs", async () => {
     await driver.quit()
   })
 
+  async function verifyUrl(url){
+    let currentUrl = await driver.getCurrentUrl();
+    assert.strictEqual(currentUrl, url);
+  }
+
+  async function login(username, password){
+    await driver.findElement(By.id("user-name")).sendKeys(username);
+    await driver.findElement(By.id("password")).sendKeys(password);
+    const loginButton = await driver.findElement(By.id("login-button"));
+    await loginButton.click()
+  }
+
+  async function loginUserName(username){
+    await driver.findElement(By.id("user-name")).sendKeys(username);
+    const loginButton = await driver.findElement(By.id("login-button"));
+    await loginButton.click()
+  }
+
+  async function clearInput(name){
+    const clearField = await driver.findElement(By.xpath(`//input[@id='${name}']`))
+    await clearField.sendKeys(Key.CONTROL, 'a') 
+    await clearField.sendKeys(Key.BACK_SPACE)
+  }
+
   describe("Test the login with incorrect credentials", async () => {
 
     it("Verify if user is unable to login using incorrect username and password", async () => {
-      try {
-        // Clear the username and password inputs for next it block
-        const usernameField = await driver.findElement(By.id("user-name"))
-        await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await usernameField.sendKeys(Key.BACK_SPACE)
+      // Clear the username and password inputs for next it block
+      await clearInput("user-name")
+      await clearInput("password")
+      await login("strandard_users", "sentret_sows")
 
-        const passwordField = await driver.findElement(By.id("password"))
-        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await passwordField.sendKeys(Key.BACK_SPACE) 
+      // Epic sadface: Username and password do not match any user in this service
+      let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
 
-        await driver.findElement(By.id("user-name")).sendKeys("strandard_users")
-        await driver.findElement(By.id("password")).sendKeys("sentret_sows")
-
-        await driver.findElement(By.id("login-button")).click()
-  
-        // Epic sadface: Username and password do not match any user in this service
-        let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
-  
-        assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
-
-      } catch (error) {
-        console.log(error)
-      } 
+      assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
     })
   
     it("Verify if user is unable to login using incorrect username but correct password", async () => {
-      try {
-        // Clear the username and password inputs for next it block
-        const usernameField = await driver.findElement(By.id("user-name"))
-        await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await usernameField.sendKeys(Key.BACK_SPACE) 
+      // Clear the username and password inputs for next it block
+      await clearInput("user-name")
+      await clearInput("password")
 
-        const passwordField = await driver.findElement(By.id("password"))
-        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await passwordField.sendKeys(Key.BACK_SPACE) 
+      await login("strandard_users", "secret_sauce")
 
-        await driver.findElement(By.id("user-name")).sendKeys("strandard_users")
-        await driver.findElement(By.id("password")).sendKeys("secret_sauce")
-  
-        await driver.findElement(By.id("login-button")).click()
-  
-        let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
-  
-        assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
+      let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
 
-  
-      } catch (error) {
-        console.log(error)
-      }
+      assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
     })
   
     it("Verify if user is unable to login using incorrect password but correct username", async () => {
-      try {
-        // Clear the username and password inputs for next it block
-        const usernameField = await driver.findElement(By.id("user-name"))
-        await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await usernameField.sendKeys(Key.BACK_SPACE) 
+      // Clear the username and password inputs for next it block
+      await clearInput("user-name")
+      await clearInput("password")
+      await login("standard_user", "sentret_sows")
 
-        const passwordField = await driver.findElement(By.id("password"))
-        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await passwordField.sendKeys(Key.BACK_SPACE) 
+      let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
 
-        await driver.findElement(By.id("user-name")).sendKeys("standard_user")
-        await driver.findElement(By.id("password")).sendKeys("sentret_sows")
-  
-        await driver.findElement(By.id("login-button")).click()
-  
-        let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
-  
-        assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
-  
-      } catch (error) {
-        console.log(error)
-      }
+      assert.strictEqual(validationMessage, "Epic sadface: Username and password do not match any user in this service")
     })
   
     it("Verify if user is unable to login with empty credentials such as username and password", async () => {
-      try {
 
-        await driver.findElement(By.className("error-button")).click()
+      await driver.findElement(By.className("error-button")).click()
 
-        // Clear the username and password inputs for next it block
-        const usernameField = await driver.findElement(By.id("user-name"))
-        await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await usernameField.sendKeys(Key.BACK_SPACE) 
+      // Clear the username and password inputs for next it block
+      await clearInput("user-name")
+      await clearInput("password")
 
-        const passwordField = await driver.findElement(By.id("password"))
-        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await passwordField.sendKeys(Key.BACK_SPACE) 
+      await driver.findElement(By.id("login-button")).click()
 
-        // await driver.wait(until.elementIsNotVisible(By.className("error-message-container")), 5000)
-  
-        await driver.findElement(By.id("login-button")).click()
-  
-        let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
-  
-        assert.strictEqual(await validationMessage.getText(), "Epic sadface: Username is required")
-  
-      } catch (error) {
-        console.log(error)
-      }
+      let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
+
+      assert.strictEqual(await validationMessage.getText(), "Epic sadface: Username is required")
     })
 
     it("Verify if user is unable to login with empty password input", async () => {
-      try {
 
-        await driver.findElement(By.className("error-button")).click()
+      await driver.findElement(By.className("error-button")).click()
 
-        // fill in username
-        await driver.findElement(By.id("user-name")).sendKeys("standard_user")
+      // fill in username
+      await loginUserName("standard_user")
 
-        // await driver.wait(until.elementIsNotVisible(By.className("error-message-container")), 5000)
-  
-        await driver.findElement(By.id("login-button")).click()
-  
-        let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
-  
-        assert.strictEqual(await validationMessage.getText(), "Epic sadface: Password is required")
-  
-      } catch (error) {
-        console.log(error)
-      }
+      let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
+
+      assert.strictEqual(await validationMessage.getText(), "Epic sadface: Password is required")
     })
 
     it("Verify if locked_out_user is unable to login", async () => {
-      try {
-        // Close the validation error message
-        await driver.findElement(By.className("error-button")).click()
 
-        // Clear the username input for next it block
-        const usernameField = await driver.findElement(By.id("user-name"))
-        await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await usernameField.sendKeys(Key.BACK_SPACE) 
+      // Close the validation error message
+      await driver.findElement(By.className("error-button")).click()
 
-        // Clear password field
-        const passwordField = await driver.findElement(By.id("password"))
-        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await passwordField.sendKeys(Key.BACK_SPACE) 
+      await clearInput("user-name")
+      await clearInput("password")
+      await login("locked_out_user", "secret_sauce")
 
-        await driver.findElement(By.id("user-name")).sendKeys("locked_out_user")
-        await driver.findElement(By.id("password")).sendKeys("secret_sauce")
+      let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
 
-        await driver.findElement(By.id("login-button")).click()
+      assert.strictEqual(validationMessage, "Epic sadface: Sorry, this user has been locked out.")
 
-        let validationMessage = await driver.findElement(By.xpath("//h3[@data-test='error']")).getText()
-  
-        assert.strictEqual(validationMessage, "Epic sadface: Sorry, this user has been locked out.")
+      // Assert url
+      await verifyUrl("https://www.saucedemo.com/")
 
-        const url = "https://www.saucedemo.com/"
-        let currentUrl = await driver.getCurrentUrl();
-        assert.equal(currentUrl, url)
-
-      } catch (error) {
-        console.log(error)
-      }
     })
 
     it("Verify if user is unable to login with empty username input", async () => {
-      try {
 
-        // Clear the username input for next it block
-        const usernameField = await driver.findElement(By.id("user-name"))
-        await usernameField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await usernameField.sendKeys(Key.BACK_SPACE) 
+      // Close the validation error message
+      await driver.findElement(By.className("error-button")).click()
+      // Clear the username input for next it block
+      await clearInput("user-name")
+      await clearInput("password")
 
-        // Clear password field
-        const passwordField = await driver.findElement(By.id("password"))
-        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await passwordField.sendKeys(Key.BACK_SPACE) 
+      // Fill in password
+      await driver.findElement(By.id("password")).sendKeys("secret_sauce")
 
-        // Fill in password
-        await driver.findElement(By.id("password")).sendKeys("secret_sauce")
+      await driver.findElement(By.id("login-button")).click()
 
-        await driver.findElement(By.id("login-button")).click()
-  
-        let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
+      let validationMessage = await driver.wait(until.elementLocated(By.xpath("//h3[@data-test='error']")))
 
-        assert.strictEqual(await validationMessage.getText(), "Epic sadface: Username is required")
-
-      } catch (error) {
-        console.log()
-      }
+      assert.strictEqual(await validationMessage.getText(), "Epic sadface: Username is required")
     })
   })
 
   describe("Test the login with correct credentials", async () => {
 
     it("Verify if user is able to login using correct username and password", async () => {
-      try {
-        // Close the validation error message
-        await driver.findElement(By.className("error-button")).click()
+      // Close the validation error message
+      await driver.findElement(By.className("error-button")).click()
 
-        // Clear password field
-        const passwordField = await driver.findElement(By.id("password"))
-        await passwordField.sendKeys(Key.CONTROL, 'a') // Select all text in the field
-        await passwordField.sendKeys(Key.BACK_SPACE) 
+      await clearInput("password")
+      await login("standard_user", "secret_sauce")
+      await driver.wait(until.urlIs("https://www.saucedemo.com/inventory.html"), 10000);
 
-        await driver.findElement(By.id("user-name")).sendKeys("standard_user")
-        await driver.findElement(By.id("password")).sendKeys("secret_sauce")
-
-        await driver.findElement(By.id("login-button")).click()
-
-        const url = "https://www.saucedemo.com/inventory.html"
-        let currentUrl = await driver.getCurrentUrl();
-        assert.equal(currentUrl, url)
-      } catch (error) {
-        console.log(error)
-      }
+      await verifyUrl("https://www.saucedemo.com/inventory.html") // assert url
     })
   })
 
