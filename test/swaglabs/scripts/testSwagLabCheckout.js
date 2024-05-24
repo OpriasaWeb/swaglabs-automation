@@ -28,10 +28,6 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
     assert.deepEqual(await currentPageTitle.getText(), page)
   }
 
-  async function verifyCartBadge(badge){
-
-  }
-
   async function completeInformation(firstname, lastname, zipcode){
     await driver.findElement(By.xpath("//input[@id='first-name']")).sendKeys(firstname)
     await driver.findElement(By.xpath("//input[@id='last-name']")).sendKeys(lastname)
@@ -66,7 +62,8 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
   async function login(username, password){
     await driver.findElement(By.id("user-name")).sendKeys(username);
     await driver.findElement(By.id("password")).sendKeys(password);
-    await driver.findElement(By.id("login-button")).click();
+    const loginButton = await driver.findElement(By.id("login-button"));
+    await loginButton.click()
   }
 
   async function clearInput(name){
@@ -94,11 +91,9 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
       await verifyTitle("Swag Labs")
 
       // Add to cart
-      addToCart("add-to-cart-sauce-labs-bolt-t-shirt")
-
-      addToCart("add-to-cart-test.allthethings()-t-shirt-(red)")
-
-      addToCart("add-to-cart-sauce-labs-onesie")
+      await addToCart("add-to-cart-sauce-labs-bolt-t-shirt")
+      await addToCart("add-to-cart-test.allthethings()-t-shirt-(red)")
+      await addToCart("add-to-cart-sauce-labs-onesie")
 
       // Assert the cart badge current value
       // Wait for the add to cart increment value
@@ -116,10 +111,10 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
       await verifyUrl("https://www.saucedemo.com/cart.html")
 
       // Assert the title of the current page
-      verifyCurrentPage("Your Cart")
+      await verifyCurrentPage("Your Cart")
 
       // Assert the product/s remove to cart
-      removeToCart("remove-sauce-labs-bolt-t-shirt") // note, will remove here
+      await removeToCart("remove-sauce-labs-bolt-t-shirt") // note, will remove here
 
       let currentCartBadge = await driver.findElement(By.className("shopping_cart_badge"))
       assert.deepEqual(await currentCartBadge.getText(), 2, "Successfully remove the added product")
@@ -163,7 +158,7 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
     it("Verify if user is unable to move forward checking-out product with empty first name but filled-in last name and zip code", async () => {
       // Fill in last name and zip code but leave the first name empty
-      lastNameAndZipCode("test", "1750")
+      await lastNameAndZipCode("test", "1750")
 
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
@@ -237,7 +232,6 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
       // Clear last name
       await clearInput('last-name')
-
       // Clear postal
       await clearInput('postal-code')
 
@@ -274,33 +268,20 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
     })
 
     it("Verify if user is able to move forward checking-out product with complete information", async () => {
-      // Clear first name
+      // Clear inputs
       await clearInput('first-name')
-
-      // Clear last name
       await clearInput('last-name')
-
-      // Clear postal
       await clearInput('postal-code')
 
       // Fill in first name but leave the last name and zip code empty
-      completeInformation("test", "test", "1750")
+      await completeInformation("test", "test", "1750")
 
+      await driver.wait(until.elementLocated(By.id("continue")), 5000)
       let continueButton = await driver.findElement(By.id("continue"))
       await continueButton.click()
 
-      // let form = await driver.findElement(By.id("continue"));
-      // await form.submit();
-
-      // Optionally, you can wait for a new page or some result to confirm the form submission
-      // await driver.wait(until.urlIs("https://www.saucedemo.com/checkout-step-two.html"), 1000);
-
       // Assert the right page - check out step two
-      // await verifyUrl("https://www.saucedemo.com/checkout-step-two.html")
-
-      const url = "https://www.saucedemo.com/checkout-step-two.html";
-      let currentUrl = await driver.getCurrentUrl();
-      assert.equal(currentUrl, url);
+      await verifyUrl("https://www.saucedemo.com/checkout-step-two.html")
 
       let storeAddedProduct = []
       let itemTotal = 0
