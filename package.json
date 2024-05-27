@@ -4,7 +4,7 @@
   "description": "swag labs automation",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --no-timeouts 'test/swaglabs/scripts/*.js' --parallel --reporter mochawesome --require mochawesome/register "
+    "test": "mocha --no-timeouts 'test/swaglabs/scripts/*.js' --parallel --reporter mochawesome --require mochawesome/register"
   },
   "repository": {
     "type": "git",

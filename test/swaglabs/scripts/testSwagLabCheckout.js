@@ -72,6 +72,10 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
     await clearField.sendKeys(Key.BACK_SPACE)
   }
 
+  async function assertEqual(actual, expected, comments){
+    assert.equal(actual, expected, comments)
+  }
+
   describe("Test login with correct credentials to redirect on inventory page", async () => {
     it("Verify if user is able to login using correct username and password", async () => {
       await login("standard_user", "secret_sauce")
@@ -102,7 +106,7 @@ describe("Verify checkout procedures of swag labs e-commerce", async () => {
 
       // Get the total, in this case this should be two (2)
       let addedToCartText = await driver.findElement(By.xpath("//span[@data-test='shopping-cart-badge']"))
-      assert.equal(await addedToCartText.getText(), 3, "Cart badge should be 3")
+      assertEqual(await addedToCartText.getText(), 3, "Cart badge should be 3")
 
       // Click the cart icon
       await addedToCartText.click()
